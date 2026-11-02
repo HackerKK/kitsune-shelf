@@ -144,6 +144,14 @@ button.fox { background: none; border: 0; padding: 0; width: 96px; cursor: point
 .smile { display: none; }
 .joy .smile { display: inline; }
 .joy .lid { display: none; }
+.rage { display: none; }
+.angry .rage { display: inline; }
+.angry .lid, .angry .smile { display: none; }
+.eyefire { transform-box: fill-box; transform-origin: 50% 100%; animation: eyefire .32s ease-in-out infinite alternate; }
+.fox.angry { animation: rage .3s linear infinite; }
+.bubble.angry, .bubble.angry::before { background: #ffd2c2; border-color: var(--pop-ink); }
+@keyframes eyefire { to { transform: scaleY(1.25) scaleX(.88); } }
+@keyframes rage { 25% { transform: translateX(-2px) rotate(-1.5deg); } 75% { transform: translateX(2px) rotate(1.5deg); } }
 .bubble.say { animation: say .28s cubic-bezier(.3, 1.6, .5, 1); transform-origin: 0 50%; }
 .modes button.mega { font-weight: 800; color: var(--pop-ink); animation: mega 1.6s ease-in-out infinite; }
 .modes button.mega[aria-pressed="true"] { background: var(--pop-ink); color: var(--pop); }
@@ -210,7 +218,7 @@ button.fox { background: none; border: 0; padding: 0; width: 96px; cursor: point
       <button id="m4" data-n="4">Будни</button>
       <button id="m6" data-n="6">Выходные</button>
       <button id="m8" data-n="8">Распродажа</button>
-      <button id="m14" data-n="14" class="mega">ГИПЕРМАРКЕТ</button>
+      <button id="m14" data-n="99" class="mega">ГИПЕРМАРКЕТ</button>
     </div>
     <button class="act" id="hintBtn">Подсказка лисы</button>
     <span class="spacer"></span>
@@ -269,14 +277,55 @@ const CATS = [
   ][v % 3] },
   { id: 'noodle', name: 'Лапша', kana: 'ラーメン', one: 'Лапша', draw: ([c, d, l]) =>
     `<path d="M44 4L37 22M52 8L42 22" stroke="#a2652f" stroke-width="3.500"/><path d="M12 24l6 34h28l6-34z" fill="${c}"/><rect x="9" y="18" width="46" height="8" rx="2" fill="#fff"/><path d="M14.500 35h35l-2.500 13H17z" fill="#fff"/><text x="32" y="46" font-size="12" text-anchor="middle" fill="${INK}" stroke="none" font-family="sans-serif" font-weight="700">麺</text>` },
-  { id: 'figure', name: 'Фигурки', kana: 'フィギュア', one: 'Фигурка', draw: ([c, d, l]) =>
-    `<ellipse cx="32" cy="56" rx="21" ry="5" fill="#b9e4ee"/><path d="M32 30L17 54h30z" fill="${c}"/><path d="M15 21C13 34 15 39 19 41M49 21c2 13 0 18-4 20" fill="${d}"/><circle cx="32" cy="20" r="15" fill="#ffe0c4"/><path d="M17 20C17 8 25 5 32 5s15 3 15 15c-5-1-9-4-11-8-3 5-11 8-19 8z" fill="${d}"/>${eyes(26, 38, 23)}` },
+  { id: 'figure', name: 'Фигурки', kana: 'フィギュア', one: 'Фигурка', draw: ([c, d, l], v) => `<ellipse cx="32" cy="56" rx="21" ry="5" fill="#b9e4ee"/>` + [
+    `<path d="M32 30L17 54h30z" fill="${c}"/><path d="M15 21C13 34 15 39 19 41M49 21c2 13 0 18-4 20" fill="${d}"/><circle cx="32" cy="20" r="15" fill="#ffe0c4"/><path d="M17 20C17 8 25 5 32 5s15 3 15 15c-5-1-9-4-11-8-3 5-11 8-19 8z" fill="${d}"/>${eyes(26, 38, 23)}`,
+    `<path d="M32 2v7"/><circle cx="32" cy="3" r="2.500" fill="#ffe14d"/><rect x="16" y="9" width="32" height="21" rx="3" fill="#c9d3dc"/><rect x="21" y="14" width="22" height="9" rx="2" fill="${INK}"/><circle cx="26" cy="18.500" r="2" fill="${l}" stroke="none"/><circle cx="38" cy="18.500" r="2" fill="${l}" stroke="none"/><rect x="20" y="31" width="24" height="16" fill="${c}"/><path d="M20 34h-7v11M44 34h7v11" fill="none" stroke-width="4"/><rect x="21" y="47" width="8" height="8" fill="#c9d3dc"/><rect x="35" y="47" width="8" height="8" fill="#c9d3dc"/>`,
+    `<path d="M50 6L38 36" stroke="#7c7f88" stroke-width="3.500"/><path d="M36 32l6 3" stroke="${INK}" stroke-width="4"/><path d="M21 32h22l3 22H18z" fill="${c}"/><path d="M32 32v22" /><circle cx="30" cy="20" r="13" fill="#ffe0c4"/><path d="M16 21l2-11 4 3 3-8 5 5 6-6 2 7 6 0-3 9c-6-3-14-3-25 1z" fill="${d}"/>${eyes(25, 35, 23)}`,
+    `<path d="M45 49c10 0 11-11 6-15" fill="none" stroke-width="4"/><path d="M19 54c-3-14 3-24 13-24s16 10 13 24z" fill="${c}"/><path d="M18 14L15 3l11 6zM46 14l3-11-11 6z" fill="${c}"/><circle cx="32" cy="20" r="15" fill="${c}"/><path d="M27 29c0-6 10-6 10 0z" fill="${l}"/>${eyes(26, 38, 19)}<path d="M18 21H9M46 21h9" stroke-width="2"/>`,
+    `<path d="M32 26L15 54h34z" fill="${d}"/><path d="M12 22h40L32 1z" fill="${c}"/><rect x="10" y="20" width="44" height="5" rx="2" fill="${d}"/><circle cx="32" cy="31" r="10" fill="#ffe0c4"/>${eyes(28, 36, 31)}${star(32, 13, 4, '#ffe14d')}`
+  ][v % 5] },
+  { id: 'acrylic', name: 'Акриловые стенды', kana: 'アクスタ', one: 'Акриловый стенд', draw: ([c, d, l], v) =>
+    `<path d="M13 52h38l4 8H9z" fill="${d}"/><path d="M16 12c0-5 4-9 9-9h14c5 0 9 4 9 9v40H16z" fill="#e7f7fb" opacity=".9"/>` + [
+      `<path d="M32 26L21 50h22z" fill="${c}"/><circle cx="32" cy="19" r="10" fill="#ffe0c4"/><path d="M22 19c0-8 5-11 10-11s10 3 10 11c-4 0-7-2-9-5-2 3-6 5-11 5z" fill="${d}"/>${eyes(28, 36, 21)}`,
+      `<path d="M21 14l-1-8 8 4M43 14l1-8-8 4" fill="${c}"/><circle cx="32" cy="22" r="12" fill="${c}"/>${eyes(27, 37, 21)}<path d="M23 50c0-13 18-13 18 0z" fill="${c}"/>`,
+      `${star(32, 28, 15, c)}${eyes(28, 36, 28)}<path d="M29 33q3 2.500 6 0" fill="none" stroke-width="2"/>`
+    ][v % 3] + `<path d="M21 10v12" stroke="#fff" stroke-width="3"/>` },
+  { id: 'kigu', name: 'Кигуруми', kana: '着ぐるみ', one: 'Кигуруми', draw: ([c, d, l], v) => [
+    `<circle cx="20" cy="8" r="5" fill="${c}"/><circle cx="44" cy="8" r="5" fill="${c}"/>`,
+    `<path d="M18 12L16 1l10 7zM46 12l2-11-10 7z" fill="${c}"/>`,
+    `<path d="M32 9l-3-8 7 6z" fill="#ffe14d"/>`,
+    `<path d="M18 10l3-7 3 5 4-6 4 6 4-6 4 6 3-5 3 7z" fill="${d}"/>`
+  ][v % 4] + `<path d="M21 26L6 37l5 8 10-6v21h9V47h4v13h9V39l10 6 5-8-15-11z" fill="${c}"/><path d="M26 30h12v17H26z" fill="${l}"/><path d="M17 18c0-14 30-14 30 0 0 10-7 13-15 13s-15-3-15-13z" fill="${c}"/><ellipse cx="32" cy="20" rx="10" ry="7" fill="#ffe0c4"/>${eyes(28, 36, 20)}` },
+  { id: 'bag', name: 'Сумки', kana: 'バッグ', one: 'Сумка', draw: ([c, d, l], v) => [
+    `<path d="M22 22V11a10 10 0 0 1 20 0v11" fill="none" stroke-width="3.500"/><path d="M10 22h44l3 37H7z" fill="${l}"/>${star(32, 40, 13, c)}`,
+    `<path d="M24 11a8 8 0 0 1 16 0" fill="none" stroke-width="3.500"/><rect x="10" y="10" width="44" height="49" rx="14" fill="${c}"/><rect x="17" y="35" width="30" height="18" rx="4" fill="${d}"/><path d="M17 42h30M20 22h24"/>`,
+    `<path d="M20 20V12a12 12 0 0 1 24 0v8" fill="none" stroke-width="3.500"/><rect x="7" y="20" width="50" height="39" rx="5" fill="${c}"/><rect x="13" y="26" width="38" height="27" rx="3" fill="#e7f7fb"/><circle cx="23" cy="34" r="5" fill="${d}"/><circle cx="35" cy="34" r="5" fill="#ffe14d"/><circle cx="23" cy="46" r="5" fill="#ef476f"/><circle cx="35" cy="46" r="5" fill="${l}"/>`,
+    `<path d="M9 30C18 4 46 4 55 30" fill="none" stroke-width="3"/><path d="M9 30h46v15a14 14 0 0 1-14 14H23A14 14 0 0 1 9 45z" fill="${c}"/><path d="M9 30c10 12 36 12 46 0" fill="${d}"/><circle cx="32" cy="37" r="3.500" fill="#ffe14d"/>`
+  ][v % 4] },
+  { id: 'sticker', name: 'Стикеры', kana: 'ステッカー', one: 'Стикеры', draw: ([c, d, l], v) =>
+    `<path d="M9 6h46v36L39 58H9z" fill="#fff"/><path d="M55 42H39v16z" fill="${l}"/>` + [
+      `${star(24, 24, 11, c)}<circle cx="42" cy="20" r="6" fill="${d}"/><circle cx="20" cy="46" r="6" fill="${d}"/>`,
+      `<path d="M32 40C14 28 16 14 25 14c4 0 7 4 7 4s3-4 7-4c9 0 11 14-7 26z" fill="${c}"/>`,
+      `<circle cx="26" cy="25" r="13" fill="${c}"/>${eyes(21, 31, 24)}<path d="M23 30q3 2.500 6 0" fill="none" stroke-width="2"/><circle cx="17" cy="48" r="4" fill="${d}"/><circle cx="30" cy="48" r="4" fill="${l}"/>`
+    ][v % 3] },
   { id: 'cards', name: 'Коллекционные карточки', kana: 'カード', one: 'Карточки', draw: ([c, d, l]) =>
     `<rect x="9" y="12" width="28" height="40" rx="3" fill="${d}" transform="rotate(-15 23 32)"/><rect x="27" y="12" width="28" height="40" rx="3" fill="${l}" transform="rotate(14 41 32)"/><rect x="18" y="9" width="28" height="44" rx="3" fill="#fff"/><rect x="22" y="13" width="20" height="25" fill="${c}"/>${star(32, 25.500, 8, '#ffe14d')}<path d="M23 43h18M23 48h12" stroke-width="2"/>` },
-  { id: 'daki', name: 'Дакимакуры', kana: '抱き枕', one: 'Дакимакура', draw: ([c, d, l]) =>
-    `<rect x="19" y="2" width="26" height="60" rx="11" fill="#fff"/><path d="M21 15c0-8 5-11 11-11s11 3 11 11v10H39v-7h-14v7h-4z" fill="${d}"/><circle cx="32" cy="20" r="8.500" fill="#ffe0c4"/><path d="M24 18c2-5 12-5 16 0z" fill="${d}"/>${eyes(28.500, 35.500, 21)}<path d="M23 34c4-3 14-3 18 0v21c-4 3-14 3-18 0z" fill="${c}"/>` },
-  { id: 'plush', name: 'Плюшевые игрушки', kana: 'ぬいぐるみ', one: 'Плюшевая игрушка', draw: ([c, d, l]) =>
-    `<circle cx="15" cy="16" r="9" fill="${c}"/><circle cx="49" cy="16" r="9" fill="${c}"/><ellipse cx="32" cy="50" rx="17" ry="12" fill="${c}"/><circle cx="32" cy="30" r="21" fill="${c}"/><ellipse cx="32" cy="36" rx="9" ry="7" fill="${l}"/>${eyes(23, 41, 27)}<path d="M29.500 34h5l-2.500 3z" fill="${INK}"/>` },
+  { id: 'daki', name: 'Дакимакуры', kana: '抱き枕', one: 'Дакимакура', draw: ([c, d, l], v) => [
+    `<rect x="19" y="2" width="26" height="60" rx="11" fill="#fff"/><path d="M21 15c0-8 5-11 11-11s11 3 11 11v10H39v-7h-14v7h-4z" fill="${d}"/><circle cx="32" cy="20" r="8.500" fill="#ffe0c4"/><path d="M24 18c2-5 12-5 16 0z" fill="${d}"/>${eyes(28.500, 35.500, 21)}<path d="M23 34c4-3 14-3 18 0v21c-4 3-14 3-18 0z" fill="${c}"/>`,
+    `<rect x="19" y="2" width="26" height="60" rx="11" fill="${l}"/><circle cx="32" cy="19" r="9" fill="#ffe0c4"/><path d="M23 18l1-8 3 3 2-6 3 4 4-5 1 6 4 0-1 7c-5-3-10-3-17-1z" fill="${d}"/>${eyes(28.500, 35.500, 20)}<path d="M22 33l10 6 10-6v24H22z" fill="${c}"/><path d="M32 39v18M22 33l10 12 10-12" fill="none"/>`,
+    `<rect x="19" y="2" width="26" height="60" rx="11" fill="#fff"/><path d="M23 13l-1-9 7 5zM41 13l1-9-7 5z" fill="${c}"/><path d="M22 22c0-9 5-13 10-13s10 4 10 13v9h-4v-9H26v9h-4z" fill="${c}"/><circle cx="32" cy="21" r="8" fill="#ffe0c4"/>${eyes(28.500, 35.500, 22)}<rect x="23" y="35" width="18" height="21" rx="4" fill="${d}"/><path d="M32 35l-3 5 3 8 3-8z" fill="${l}"/>`,
+    `<rect x="19" y="2" width="26" height="60" rx="11" fill="${c}"/><path d="M24 15l-1-8 7 4M40 15l1-8-7 4" fill="${l}"/><circle cx="32" cy="20" r="11" fill="${l}"/>${eyes(28, 36, 19)}<path d="M29.500 24q2.500 2 5 0" fill="none" stroke-width="2"/><path d="M24 38c0-5 16-5 16 0v17c-4 3-12 3-16 0z" fill="${l}"/>`,
+    `<rect x="19" y="2" width="26" height="60" rx="11" fill="${l}"/><path d="M32 29c-10-7-9-15-4-15 2 0 4 2 4 2s2-2 4-2c5 0 6 8-4 15z" fill="${c}"/>${star(26, 41, 5, d)}${star(38, 39, 4, c)}<path d="M32 56c-6-4-5-9-2-9 1 0 2 1 2 1s1-1 2-1c3 0 4 5-2 9z" fill="${d}"/>`
+  ][v % 5] },
+  { id: 'plush', name: 'Плюшевые игрушки', kana: 'ぬいぐるみ', one: 'Плюшевая игрушка', draw: ([c, d, l], v) => v % 6 > 2 ? [
+    `<path d="M26 16L34 1l8 17z" fill="${c}"/><path d="M6 44L1 30l13 6zM58 44l5-14-13 6z" fill="${c}"/><path d="M8 38C8 20 20 13 32 13s24 7 24 25c0 12-11 20-24 20S8 50 8 38z" fill="${c}"/><path d="M14 44c8 6 28 6 36 0-2 10-10 14-18 14s-16-4-18-14z" fill="#fff"/><path d="M20 47l3 4 3-3 3 4 3-4 3 4 3-4 3 3 3-4" fill="none" stroke-width="2"/>${eyes(21, 43, 32)}`,
+    `<path d="M13 31L5 44l10 2M51 31l8 13-10 2" fill="${d}"/><path d="M20 55l-5 6h13zM44 55l5 6H36z" fill="#ffb703"/><ellipse cx="32" cy="33" rx="21" ry="27" fill="${d}"/><path d="M32 22c-11 0-15 9-15 19 0 9 7 15 15 15s15-6 15-15c0-10-4-19-15-19z" fill="#fff"/>${eyes(25, 39, 25)}<path d="M28 28h8l-4 5z" fill="#ffb703"/>`,
+    `<path d="M32 3C39 14 58 26 58 42c0 11-11 18-26 18S6 53 6 42C6 26 25 14 32 3z" fill="${c}"/><ellipse cx="20" cy="30" rx="4" ry="7" fill="${l}" stroke="none"/>${eyes(23, 41, 41)}<path d="M27 46q5 5 10 0" fill="none"/>`
+  ][v % 6 - 3] : [
+    `<circle cx="15" cy="16" r="9" fill="${c}"/><circle cx="49" cy="16" r="9" fill="${c}"/>`,
+    `<path d="M14 16L11 1l13 8zM50 16l3-15-13 8z" fill="${c}"/>`,
+    `<ellipse cx="22" cy="10" rx="6" ry="13" fill="${c}"/><ellipse cx="42" cy="10" rx="6" ry="13" fill="${c}"/>`
+  ][v % 3] + `<ellipse cx="32" cy="50" rx="17" ry="12" fill="${c}"/><circle cx="32" cy="30" r="21" fill="${c}"/><ellipse cx="32" cy="36" rx="9" ry="7" fill="${l}"/>${eyes(23, 41, 27)}<path d="M29.500 34h5l-2.500 3z" fill="${INK}"/>` },
   { id: 'manga', name: 'Манга', kana: '漫画', one: 'Манга', draw: ([c, d, l]) =>
     `<rect x="11" y="5" width="42" height="54" rx="2" fill="${l}"/><rect x="11" y="5" width="9" height="54" fill="${d}"/><path d="M36 13v8M46 19l-5 6M26 19l5 6M48 33h-8M24 33h8" stroke-width="2"/><text x="36" y="42" font-size="28" text-anchor="middle" fill="${c}" stroke="${INK}" stroke-width="1.500" font-family="sans-serif" font-weight="900">!</text><path d="M25 51h22"/>` },
   { id: 'gacha', name: 'Гачапон', kana: 'ガチャ', one: 'Капсула гачапона', draw: ([c, d, l]) =>
@@ -289,11 +338,20 @@ const PAL = [
   ['#ef476f', '#a91f47', '#ffd1dc'], ['#2ec4b6', '#127a71', '#c9f5ef'], ['#ffb703', '#b87400', '#fff0c2'],
   ['#5b7fff', '#2f49ad', '#d8e0ff'], ['#9b5de5', '#6130a5', '#eadcff']
 ];
-const HYPER = 14;
+const HYPER = 99;
 let PER = 4;
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const OPENERS = [
+  'Пришёл класс на экскурсию. Экскурсия удалась, стеллаж нет.',
+  'Кто-то искал лимитку и перевернул весь ряд.',
+  'Два коллекционера поспорили. Спор кончился тут.',
+  'Я отошла за тофу на минуту. Одну минуту!',
+  'Тануки притворился покупателем. Снова.',
+  'Косплей-сходка закончилась. Полки это запомнят.',
+  'Ребёнок сказал «мама, смотри» двести раз подряд.',
+  'Кто-то вернул товар. Весь. И не туда.',
+  'Открываем смену. Точнее, откапываем.',
   'Школьники искали редкую карточку. Перерыли всё!',
   'Фанат полчаса выбирал вайфу и бросил всё где попало.',
   'Косплееры зашли после фестиваля. Стеллаж не выжил.',
@@ -302,10 +360,123 @@ const OPENERS = [
   'Туристы купили один брелок и переставили весь магазин.',
   'Опять был день гачапона. Хвосты дыбом!'
 ];
-const PRAISE = ['На место!', 'Вот это порядок.', 'Так и лежит. Хорошо.', 'Покупателям понравится.', 'Лисий глаз не обманешь.'];
-const WRONG = ['Хм, это тут не живёт.', 'Ещё не дома. Смотри на ценники.', 'Эта полка не для него.'];
+const PRAISE = ['На место!', 'Вот это порядок.', 'Так и лежит. Хорошо.', 'Покупателям понравится.', 'Лисий глаз не обманешь.', 'Дома!', 'Красота, прямо как мой хвост.', 'Беру тебя в ученики.', 'Инари одобряет.', 'Ровненько. Почти.', 'Хвосты довольны.', 'Ещё один спасён.', 'Кон-кон, отлично!', 'Руки у тебя что надо.'];
+const WRONG = ['Хм, это тут не живёт.', 'Ещё не дома. Смотри на ценники.', 'Эта полка не для него.', 'Смело. Неверно, но смело.', 'Покупатели сказали бы спасибо. Они так же ставят.', 'Ты точно читаешь ценники?', 'Это морок или ошибка?', 'Переезд не удался.', 'Я сделаю вид, что не видела.'];
 const HYPER_OPEN = ['Завезли ВСЁ. Вообще всё. Держись за хвост!', 'Гипермаркет! Тут заблудился даже домовой.', 'Весь склад на полках. И весь не на своих местах.'];
+const ALREADY = [
+  'Я уже подсветила! Вон же, мигает.',
+  'Подсказка та же. Новую не дам, пока не используешь эту.',
+  'Ещё раз нажмёшь, и она не станет ярче. Смотри на стеллаж!',
+  'Мигает. Прямо сейчас. Для тебя.'
+];
+const IGNORED = [
+  'Я подсветила, а ты мимо. Ну-ну.',
+  'Значит, мои подсказки тебе не указ?',
+  'Сделаю вид, что не заметила. Один раз.',
+  'Лисья мудрость для кого мигает, а?'
+];
+const ANGRY = [
+  'ТРИ РАЗА! Хвосты дыбом, глаза в огне!',
+  'Я шестьсот лет живу, а такого не видела!',
+  'Сейчас превращу тебя в брелок.',
+  'Ещё раз проигнорируешь, и ценники загорятся. По-настоящему.',
+  'Я ЁКАЙ, между прочим! Меня боятся деревнями!',
+  'Подсказка мигает. Я тоже уже мигаю.',
+  'Прокляну твой гачапон. Одни дубликаты до конца жизни!',
+  'Инари всё видит. И я всё вижу. Огнём.'
+];
+const ANGRY_PET = ['Руки убрал! Или убрала. Руки!', 'Не гладь меня, я в ярости!', 'Гр-р-р. Ладно, за ушком можно. Нет! Нельзя!', 'Укушу. Я предупредила.'];
+const COOLED = ['Ладно, остыла. Хвосты на месте.', 'Фух. Пойду выпью рамунэ.', 'Вот, можешь же, когда хочешь.', 'Огонь потушен. Пока что.'];
 const CHATTER = [
+  'Одна покупательница час выбирала между двумя одинаковыми значками.',
+  'Лисы умеют превращаться в людей. Но кассу это не отменяет.',
+  'Если кружка улыбается, значит, она что-то знает.',
+  'Клиент спросил скидку на проклятый бокс. Я подумала и дала.',
+  'Я не ворую тофу. Оно само ко мне приходит.',
+  'Жареный тофу принимаю как оплату. Неофициально.',
+  'Плакат опять помялся. Я тут ни при чём, это хвост.',
+  'Девять хвостов это красиво, но попробуй пройди между стеллажами.',
+  'Сенпай так и не заметил меня. И ценник тоже.',
+  'В этом сезоне все хотят одного персонажа. Его, конечно, нет в наличии.',
+  'Фигурка без коробки теряет половину цены. И весь смысл жизни.',
+  'Не снимай плёнку с бокса! Я слышу, как она шуршит, издалека.',
+  'Кто-то опять спросил, настоящая ли я. А ты настоящий?',
+  'Ночью здесь тихо. Только дакимакуры вздыхают.',
+  'Коллекционные карточки надо хранить в темноте. Как и мои планы.',
+  'Редкая карточка выпадает раз в сто паков. Я считала. Вру, раз в двести.',
+  'Лапшу завариваем три минуты. Я жду четыре, я бессмертная.',
+  'Острая лапша? Для ёкая это просто тёплый суп.',
+  'Снеки с васаби снова кончились. Подозреваю тануки.',
+  'Тануки должен мне двести иен и один плюшевый хвост.',
+  'Каппа заходил. Весь пол в воде, зато купил три манги.',
+  'Вчера заходил тэнгу. Сказал, что у нас дорого, и улетел.',
+  'Они-покупатели самые вежливые. С дубиной все вежливые.',
+  'Юки-онна открыла холодильник с напитками, и он больше не нужен.',
+  'Манеки-неко на кассе машет лапой. Я подозреваю, он на меня работает.',
+  'Цукумогами говорят, что вещи оживают через сто лет. Наш стеллаж почти готов.',
+  'Гачапон я трясти не разрешаю. Но сама трясу.',
+  'Брелков много не бывает. Бывает мало рюкзаков.',
+  'На одном рюкзаке я насчитала сорок значков. Он звенел как храм.',
+  'Значок криво? Это авторский стиль.',
+  'Манга на японском продаётся лучше. Картинки понятны всем.',
+  'Том первый есть, том третий есть, второй ушёл в легенду.',
+  'Последний том выйдет когда-нибудь. Я бессмертная, я дождусь.',
+  'Автор снова ушёл на перерыв. Я уже видела три эпохи и два его перерыва.',
+  'Опенинг этого аниме застрял в ушах. А уши у меня большие.',
+  'Спойлеров не будет. Хотя я знаю всё, я видела будущее. И финал так себе.',
+  'Лучшая вайфу? Я не отвечаю на провокации. Это я.',
+  'Спор о лучшем персонаже закончился у кассы. Оба купили по фигурке.',
+  'Косплей у того парня хороший. Только уши не настоящие, как у некоторых.',
+  'Меня приняли за косплеершу и спросили, где я купила хвост.',
+  'Сказала покупателю, что я древний дух. Он спросил, есть ли у меня инстаграм.',
+  'Сфоткали меня для блога. На снимке только размытый огонёк. Классика.',
+  'Плюшевую акулу гладят чаще, чем меня. Это обидно.',
+  'Дакимакуру нельзя примерить. Я устала это объяснять.',
+  'Футболка размера L на самом деле M. Японские лекала, смирись.',
+  'Запах картона от новой поставки. Духи бы такие.',
+  'Поставка приехала. Ножа нет. Есть когти.',
+  'Сканер штрихкодов опять пищит на меня. Чует магию.',
+  'Касса не сходится на одну иену. За это мне будет стыдно ещё лет двести.',
+  'Чек нужен? Могу выдать на свитке.',
+  'Скидка только по промокоду. Или за хорошую сказку.',
+  'Я могу наслать морок и сделать цену меньше. Но ты всё равно заплатишь полную.',
+  'Морок на покупателей больше не использую. Почти.',
+  'Сегодня пятница. Или вторник. За шестьсот лет как-то всё равно.',
+  'Раньше я путала самураев на дорогах. Теперь смотрю, как путают товар.',
+  'Я помню времена, когда лапша была без крышки.',
+  'В эпоху Эдо такого бардака не было. Там и стеллажей не было.',
+  'Мой первый хвост вырос за сто лет. А тут за три огонька. Инфляция.',
+  'Девятихвостые становятся мудрыми. Пока вижу только больше шерсти на полках.',
+  'Линяю. Если найдёшь рыжий волос в манге, это бонус издания.',
+  'Лисий огонь отлично подсвечивает витрину. И экономит свет.',
+  'Кон-кон! Это по-лисьи «добрый день». Или «отдай тофу».',
+  'Прячу хвост под фартук, а он всё равно вылезает.',
+  'Фартук мне мал. Там, где хвосты, он вообще заканчивается.',
+  'Перерыв? Какой перерыв? Я перерыв последний раз брала при сёгуне.',
+  'Если долго смотреть на полку, полка начнёт смотреть на тебя.',
+  'Эта фигурка только что моргнула. Я видела.',
+  'Кружка с котом продаётся лучше, чем кружка с лисой. Я запомнила.',
+  'Все хотят редкий вариант. Никто не хочет его протирать.',
+  'Кто поставил коробку вверх ногами? Фигурка теперь в депрессии.',
+  'Предзаказ оформляют за год. Я уважаю такое терпение.',
+  'Один покупатель сказал «только посмотрю» и ушёл с тремя пакетами.',
+  'Мелочь на гачапон разменяю. Нервы не разменяю.',
+  'Иногда мне кажется, что товары размножаются. Особенно брелки.',
+  'Тихо. Слышишь? Это ещё один покупатель открывает коробку.',
+  'Рамунэ открывается шариком. Не все это знают. Я смотрю и наслаждаюсь.',
+  'Онигири из холодильника холодный. Зато как я.',
+  'Моти не брать двумя руками одновременно. Жадность наказуема.',
+  'Покки считается за еду. Это моё официальное мнение.',
+  'Лапшу с сыром пробовала. Теперь я знаю, почему боги молчат.',
+  'Сейчас бы миску удона и никаких покупателей.',
+  'Ты неплохо справляешься. Для человека.',
+  'Если выйдет хорошо, расскажу тебе секрет. Если плохо, тоже расскажу, но не тебе.',
+  'Хороший продавец всегда знает, где лежит товар. Я вот знаю, где он должен лежать.',
+  'Порядок на полке это порядок в голове. У меня там девять хвостов и всё плохо.',
+  'Не торопись. Хотя покупатели торопятся. Хотя мне всё равно.',
+  'Стеллаж качается. Это не я. Но если что, это я.',
+  'Я бы помогла лапами, но у меня маникюр.',
+  'Мне нравится, как ты двигаешь товары. Я слежу с вон той полки.',
   'Ёкаи не устают. Но я бы вздремнула.',
   'Я служу Инари, а работаю тут. Платят рисом.',
   'Ценник можно и переклеить. Шучу. Наверное.',
@@ -319,6 +490,14 @@ const CHATTER = [
   'Лапшу не вскрывать! Даже если очень хочется.',
   'Сегодня обещали новый тираж. Спаси нас, Инари.',
   'Если дакимакура смотрит на тебя, просто не смотри в ответ.',
+  'Кигуруми лисы? У меня такой от рождения. Бесплатно.',
+  'Человек в кигуруми спросил, из какой я ткани.',
+  'Акриловый стенд падает от дыхания. Не дыши на витрину.',
+  'С акрилового стенда снимают плёнку раз в жизни. Это почти обряд.',
+  'В сумку помещается ровно на один значок меньше, чем нужно.',
+  'Сумка с окошком нужна, чтобы все видели твои значки. И твой бюджет.',
+  'Робот на полке клянётся, что он тоже ёкай. Документов нет.',
+  'Фигурка самурая смотрит на меня с осуждением. Помнит, наверное.',
   'Огоньки красивые, но ценники от них не загораются. Почти.',
   'Тот покупатель вернётся. Они всегда возвращаются.',
   'Гачапон опять выдал ту же капсулу. Судьба.',
@@ -328,11 +507,15 @@ const CHATTER = [
 const NOSY = [
   (it, sh) => `${it} на полке «${sh}»? Серьёзно?`,
   (it, sh) => `Вижу непорядок: ${it.toLowerCase()} среди полки «${sh}».`,
-  (it, sh) => `«${sh}» и ${it.toLowerCase()}. Смелое сочетание.`
+  (it, sh) => `«${sh}» и ${it.toLowerCase()}. Смелое сочетание.`,
+  (it, sh) => `${it} заблудилась на полке «${sh}». Или заблудился. Спасай.`,
+  (it, sh) => `На полке «${sh}» лежит ${it.toLowerCase()}. Я всё вижу.`,
+  (it, sh) => `Полка «${sh}» жалуется: ${it.toLowerCase()} не её.`,
+  (it, sh) => `Если ${it.toLowerCase()} останется на полке «${sh}», я начну брать за это деньги.`
 ];
-const IDLE = ['Ау! Товар сам не перепрыгнет.', 'Задумалась? Я вот уже третий хвост чешу.', 'Покупатели уже у дверей. Шучу, но поторопись.'];
-const CLOSE = ['Ещё чуть-чуть! Вижу конец хаоса.', 'Почти всё. Не подведи мои хвосты.'];
-const PET = ['Фыр!', 'Ещё за ушком, пожалуйста.', 'Эй, я на работе!', 'Кон-кон!', 'Хвосты не трогать. Ладно, можно один.'];
+const IDLE = ['Ау! Товар сам не перепрыгнет.', 'Задумчивость это хорошо. Я вот уже третий хвост чешу.', 'Покупатели уже у дверей. Шучу, но поторопись.', 'Ты там уснул или уснула? Лисы так тоже умеют.', 'Я успела постареть. Ещё на минуту из вечности.', 'Может, морок навела случайно? Шевелись!', 'Эй, стеллаж не кусается. Это я кусаюсь.'];
+const CLOSE = ['Ещё чуть-чуть! Вижу конец хаоса.', 'Почти всё. Не подведи мои хвосты.', 'Финишная прямая! Держись.', 'Осталась ерунда. Я уже чую промокод.', 'Ещё пара обменов, и пойдём есть тофу.'];
+const PET = ['Фыр!', 'Ещё за ушком, пожалуйста.', 'Эй, я на работе!', 'Кон-кон!', 'Хвосты не трогать. Ладно, можно один.', 'Мур. То есть, грозный лисий рык.', 'За такое обычно платят тофу.', 'Пальцы посчитай потом.', 'Приятно. Но товар сам себя не разложит.', 'Ты гладишь древнего духа. Гордись.', 'Левее. Ещё левее. Вот.', 'Об этом никому, ясно?'];
 
 const $ = id => document.getElementById(id);
 const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -343,6 +526,7 @@ const store = {
 };
 
 let flames = store.get('flames', 0), mode = store.get('mode', 6);
+if (mode === 14) mode = HYPER;
 let shelves = [], items = [], slots = [], par = 0, moves = 0, hints = 0, start = 0, tick = 0, finished = false, picked = -1;
 
 const tailsOf = f => Math.min(9, 1 + Math.floor(f / 3));
@@ -353,7 +537,9 @@ function foxSVG(n, grew) {
   const spread = n === 1 ? [48] : Array.from({ length: n }, (_, i) => -fan + 2 * fan * i / (n - 1));
   const tails = spread.map((a, i) => `<g transform="rotate(${a.toFixed(1)} 80 106)"><g class="tail${grew && i === n - 1 ? ' grow' : ''}" style="--d:-${(i * .41).toFixed(2)}s"><path d="M80 106C60 86 60 48 80 18c20 30 20 68 0 88z" fill="${O}"/><path d="M80 18c-7 12-11 22-11 32 7-6 15-6 22 0 0-10-4-20-11-32z" fill="${W}"/></g></g>`).join('');
   const face = `<path class="smile" d="M60 60q5-6 10 0M90 60q5-6 10 0" fill="none" stroke-width="3.500"/>
-    <g class="lid"><ellipse cx="65" cy="60" rx="4" ry="5" fill="${INK}" stroke="none"/><ellipse cx="95" cy="60" rx="4" ry="5" fill="${INK}" stroke="none"/></g>`;
+    <g class="lid"><ellipse cx="65" cy="60" rx="4" ry="5" fill="${INK}" stroke="none"/><ellipse cx="95" cy="60" rx="4" ry="5" fill="${INK}" stroke="none"/></g>
+    <g class="rage">${[65, 95].map((x, k) => `<g class="eyefire" style="animation-delay:-${k * .13}s"><path d="M${x} 44c3 6 8 9 8 15a8 8 0 0 1-16 0c0-6 5-9 8-15z" fill="#ff3b1f" stroke-width="2"/><path d="M${x} 54c1.500 3 4 4 4 7a4 4 0 0 1-8 0c0-3 2.500-4 4-7z" fill="#ffe14d" stroke="none"/></g>`).join('')}
+    <path d="M52 44l20 9M108 44l-20 9" fill="none" stroke-width="5"/></g>`;
   return `<svg viewBox="-10 0 180 130" width="100%"><g stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">${tails}
     <path d="M56 126c-6-28 6-48 24-48s30 20 24 48z" fill="${O}"/><path d="M68 126c-3-18 3-32 12-32s15 14 12 32z" fill="${W}"/>
     <g class="ear"><path d="M47 50L44 14l27 20z" fill="${O}"/><path d="M51 34l-2-11 11 8z" fill="${R}" stroke="none"/></g><path d="M113 50l3-36-27 20z" fill="${O}"/><path d="M109 34l2-11-11 8z" fill="${R}" stroke="none"/>
@@ -375,6 +561,7 @@ function say(t, joy) {
   if (joy) joyT = setTimeout(() => f.classList.remove('joy'), 1400);
 }
 function chatterLine() {
+  if ($('fox').classList.contains('angry')) return pick(ANGRY);
   const left = misplaced(), bad = items.map((_, i) => i).filter(i => !isHome(i));
   if (Date.now() - lastMove > 30000 && start) return pick(IDLE);
   if (left > 0 && left <= 6) return pick(CLOSE);
@@ -471,10 +658,11 @@ function drawStats() {
   $('tails').textContent = `Хвостов: ${t} из 9`;
 }
 function drawFox() { $('fox').innerHTML = foxSVG(tailsOf(flames)); }
-function clearMarks() { slots.forEach(s => s.classList.remove('hint', 'picked')); picked = -1; }
+function clearMarks() { slots.forEach(s => s.classList.remove('picked')); picked = -1; }
 
 function newGame() {
   clearInterval(tick); clearTimeout(winT); start = 0; moves = 0; hints = 0; finished = false; picked = -1; lastMove = Date.now();
+  hintPair = null; calm();
   $('end').hidden = true;
   $('end').querySelectorAll('.fx').forEach(p => p.remove());
   PER = mode === HYPER ? 6 : 4;
@@ -482,8 +670,8 @@ function newGame() {
   shelves = shuffle(CATS.map(c => c.id)).slice(0, mode);
   items = [];
   shelves.forEach(cat => {
-    const pal = shuffle(PAL.slice());
-    for (let k = 0; k < PER; k++) items.push({ cat, pal: pal[k % pal.length], v: k, r: Math.round((Math.random() - .5) * 36) });
+    const pal = shuffle(PAL.slice()), first = Math.floor(Math.random() * 60);
+    for (let k = 0; k < PER; k++) items.push({ cat, pal: pal[k % pal.length], v: first + k, r: Math.round((Math.random() - .5) * 36) });
   });
   do { shuffle(items); } while (misplaced() < items.length * .7 || shelves.some((_, s) => items.slice(s * PER, s * PER + PER).every(it => it.cat === shelves[s])));
   par = misplaced();
@@ -526,6 +714,7 @@ function swap(a, b, dropAt) {
   [items[a], items[b]] = [items[b], items[a]];
   moves++;
   clearMarks();
+  const hintNote = trackHint(a, b);
   drawSlot(a); drawSlot(b);
   fly(a, cb, isHome(a) && !wasA);
   fly(b, dropAt || ca, isHome(b) && !wasB);
@@ -539,14 +728,15 @@ function swap(a, b, dropAt) {
   });
   drawStats();
   if (misplaced() === 0) return win();
-  if (done) say(`Полка «${done}» готова!`, true);
+  if (hintNote) say(hintNote);
+  else if (done) say(`Полка «${done}» готова!`, true);
   else if (gained === 2) say('Два товара одним махом!', true);
   else if (gained === 1) say(pick(PRAISE), true);
   else say(pick(WRONG));
 }
 
 function win() {
-  finished = true; clearInterval(tick);
+  finished = true; clearInterval(tick); calm(); clearHint();
   say('Готово! Смотри, какая красота!', true);
   winT = setTimeout(showWin, RM ? 0 : 900);
 }
@@ -576,8 +766,39 @@ function showWin() {
   $('againBtn').focus();
 }
 
+let hintPair = null, ignored = 0, angryT = 0;
+function clearHint() { hintPair = null; slots.forEach(s => s.classList.remove('hint')); }
+function calm() {
+  clearTimeout(angryT); ignored = 0;
+  $('fox').classList.remove('angry'); $('bubble').classList.remove('angry');
+}
+function ignoreHint(pool) {
+  ignored++;
+  if (ignored < 3) return pick(pool);
+  $('fox').classList.add('angry'); $('bubble').classList.add('angry');
+  clearTimeout(angryT);
+  angryT = setTimeout(() => { calm(); say(pick(COOLED)); }, 15000);
+  return pick(ANGRY);
+}
+/* A hint costs a flame only when the player makes exactly the highlighted swap. */
+function trackHint(a, b) {
+  if (!hintPair) return null;
+  const [f, t] = hintPair;
+  if ((a === f && b === t) || (a === t && b === f)) {
+    const was = $('fox').classList.contains('angry');
+    hints++; clearHint(); calm();
+    return was ? pick(COOLED) : null;
+  }
+  if (a === f || a === t || b === f || b === t) clearHint();
+  return ignoreHint(IGNORED);
+}
+
 function hint() {
   if (finished) return;
+  if (hintPair) {
+    slots[hintPair[0]].scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' });
+    return say(ignoreHint(ALREADY));
+  }
   clearMarks();
   const bad = items.map((_, i) => i).filter(i => !isHome(i));
   const targetOf = i => bad.filter(j => shelves[Math.floor(j / PER)] === items[i].cat);
@@ -589,10 +810,10 @@ function hint() {
     if (from < 0 && t.length) { from = i; to = t[0]; }
   }
   if (from < 0) return;
-  hints++;
+  hintPair = [from, to];
   slots[from].classList.add('hint'); slots[to].classList.add('hint');
   slots[from].scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' });
-  say(`Поменяй подсвеченные. Подсказка стоит огонька, уже взято: ${hints}.`);
+  say('Поменяй подсвеченные. Огонёк спишу, только если воспользуешься.');
 }
 
 /* Drag or tap: one pointer handler covers mouse and touch. */
@@ -641,7 +862,7 @@ $('rack').addEventListener('click', e => {
   const s = e.target.closest('.slot');
   if (!s || skipClick || finished) return;
   const i = Number(s.dataset.i);
-  if (picked < 0) { slots.forEach(x => x.classList.remove('hint')); picked = i; s.classList.add('picked'); }
+  if (picked < 0) { picked = i; s.classList.add('picked'); }
   else if (picked === i) { s.classList.remove('picked'); picked = -1; }
   else swap(picked, i);
 });
@@ -662,7 +883,8 @@ $('copyBtn').addEventListener('click', () => {
   else manual();
 });
 $('fox').addEventListener('click', e => {
-  say(pick(PET), true);
+  if ($('fox').classList.contains('angry')) say(pick(ANGRY_PET));
+  else say(pick(PET), true);
   const r = $('fox').getBoundingClientRect();
   burst(r.left + r.width / 2, r.top + r.height / 3, 6);
 });
